@@ -33,9 +33,9 @@
 ```json
 {
     "id": 377749,
-	"workplace": "andcool_activity",
-	"file": "README.md",
-	"debugging": false
+    "workplace": "andcool_activity",
+    "file": "README.md",
+    "debugging": false
 }
 ```
 Описание полей запроса:  
