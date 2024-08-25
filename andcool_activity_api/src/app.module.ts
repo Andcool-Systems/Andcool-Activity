@@ -1,0 +1,21 @@
+import { Module } from '@nestjs/common';
+import { ActivityController } from './activity/activity.controller';
+import { ActivityService } from './activity/activity.service';
+import { CacheModule } from '@nestjs/cache-manager';
+import { ConfigModule } from '@nestjs/config';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+
+@Module({
+    imports: [
+        CacheModule.register(),
+        ConfigModule.forRoot(),
+        ThrottlerModule.forRoot([{
+            ttl: 60000,
+            limit: 50,
+        }])
+    ],
+    controllers: [ActivityController],
+    providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }, ActivityService],
+})
+export class AppModule { }
