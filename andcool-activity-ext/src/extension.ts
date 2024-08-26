@@ -7,7 +7,7 @@ const generateRandomNumber = (length: number): number => {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-const API_URL = 'http://activity.andcool.ru';
+const API_URL = 'https://activity.andcool.ru';
 const PERIOD = 30;
 const activity_id = generateRandomNumber(6);
 let API_KEY = '';
@@ -86,7 +86,7 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	const openActivity = vscode.commands.registerCommand('andcool-activity-ext.open_url', async () => {
-		vscode.env.openExternal(vscode.Uri.parse(await config.get<string>('url', '')))
+		vscode.env.openExternal(vscode.Uri.parse(config.get<string>('url', '')))
 	});
 
 	const api_set = vscode.commands.registerCommand('andcool-activity-ext.set_api_key', async (val) => {
