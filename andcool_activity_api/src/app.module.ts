@@ -5,6 +5,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { PrismaService } from './prisma/prisma.service';
 
 @Module({
     imports: [
@@ -16,6 +17,6 @@ import { APP_GUARD } from '@nestjs/core';
         }])
     ],
     controllers: [ActivityController],
-    providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }, ActivityService],
+    providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }, ActivityService, PrismaService],
 })
 export class AppModule { }

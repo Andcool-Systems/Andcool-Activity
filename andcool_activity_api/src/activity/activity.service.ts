@@ -1,63 +1,126 @@
-import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { HeartbeatDto } from './dto/activity.dto';
+import { EndActivityDto } from './dto/endActivity.dto';
+import { Session } from 'src/guards/auth.guard';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { v4 as uuidv4 } from 'uuid';
 
 
 interface Activity {
-    id: number,
-    workplace: string,
-    file: string,
-    debugging: boolean,
-    last_heartbeat: Date,
-    start_time: Date,
+    id: number;
+    workplace: string;
+    file: string;
+    editor: string;
+    debugging: boolean;
+    start_time: Date;
+    last_heartbeat: Date;
+    Userid: number | null;
 }
 
 @Injectable()
 export class ActivityService {
-    constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) { }
+    constructor(private readonly prismaService: PrismaService) { }
 
-    async heartbeat(body: HeartbeatDto) {
-        const cache: string = await this.cacheManager.get('activity') ?? '[]';
-        let parsed = JSON.parse(cache) as Activity[];
-        const now = new Date();
+    async heartbeat(body: HeartbeatDto, session: Session) {
+        const activity = await this.prismaService.activity.findFirst({ where: { id: body.id } });
 
-        const activity = parsed.find((activity) => activity.id === body.id);
-        if (activity) {
-            activity.workplace = body.workplace;
-            activity.file = body.file;
-            activity.debugging = body.debugging;
-            activity.last_heartbeat = now;
-        } else {
-            parsed.push({
-                id: body.id,
+        if (!activity) {
+            await this.prismaService.activity.create({
+                data: {
+                    id: body.id,
+                    workplace: body.workplace,
+                    file: body.file,
+                    debugging: body.debugging,
+                    editor: body.editor,
+                    User: { connect: { id: session.id } }
+                }
+            });
+            return { statusCode: 201 }
+        }
+
+        if (activity.Userid !== session.id) {
+            return { statusCode: 403, message: 'Forbidden' };
+        }
+
+        await this.prismaService.activity.update({
+            where: { id: activity.id },
+            data: {
                 workplace: body.workplace,
                 file: body.file,
                 debugging: body.debugging,
-                last_heartbeat: now,
-                start_time: now
-            });
-        }
+                editor: body.editor,
+                last_heartbeat: new Date()
+            }
+        });
 
-        await this.cacheManager.set('activity', JSON.stringify(parsed), 0);
+        return { statusCode: 201 }
     }
 
-    async getActivity() {
-        const cache: string = await this.cacheManager.get('activity') ?? '[]';
+    async getActivity(code: string) {
+        const user = await this.prismaService.user.findFirst({ where: { code: code }, include: { activities: true } });
+
+        if (!user) {
+            return {
+                statusCode: 404,
+                message: 'Activity not found'
+            }
+        }
+
         const TTL = Number(process.env.TTL);
         const now_date = Date.now();
 
-        const parsed: Activity[] = JSON.parse(cache).filter((activity: Activity) => {
+        const parsed: Activity[] = user.activities.filter(async (activity: Activity) => {
             const last_heartbeat = new Date(activity.last_heartbeat).getTime();
-            return now_date - last_heartbeat <= TTL;
+            if (now_date - last_heartbeat > TTL) {
+                await this.prismaService.activity.delete({ where: { id: activity.id } });
+                return false;
+            }
+            return true;
         });
 
-        await this.cacheManager.set('activity', JSON.stringify(parsed), 0);
-        return parsed.map((activity) => ({
-            id: activity.id,
-            workplace: activity.workplace,
-            file: activity.file,
-            debugging: activity.debugging,
-            start_time: activity.start_time,
-        }));
+        return {
+            statusCode: 200,
+            activities: parsed.map((activity) => ({
+                id: activity.id,
+                workplace: activity.workplace,
+                file: activity.file,
+                editor: activity.editor,
+                debugging: activity.debugging,
+                start_time: activity.start_time,
+            }))
+        };
+    }
+
+    async endActivity(body: EndActivityDto, session: Session) {
+        const activity = await this.prismaService.activity.findFirst({ where: { id: body.id } });
+
+        if (!activity) {
+            return {
+                statusCode: 404,
+                message: 'Activity not found'
+            }
+        }
+
+        if (activity.Userid !== session.id) {
+            return { statusCode: 403, message: 'Forbidden' };
+        }
+
+        await this.prismaService.activity.delete({ where: { id: activity.id } });
+        return { statusCode: 200 }
+    }
+
+    async register() {
+        const user = await this.prismaService.user.create({
+            data: {
+                token: uuidv4(),
+                code: Math.random().toString(36).substring(2, 8)
+            }
+        });
+
+        return {
+            statusCode: 201,
+            token: user.token,
+            code: user.code
+        }
     }
 }

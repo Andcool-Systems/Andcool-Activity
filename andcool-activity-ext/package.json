@@ -11,6 +11,7 @@
   "engines": {
     "vscode": "^1.92.0"
   },
+  "repository": "https://github.com/Andcool-Systems/Andcool-Activity",
   "categories": [
     "Other"
   ],
@@ -31,6 +32,10 @@
       {
         "command": "andcool-activity-ext.set_api_key",
         "title": "Andcool Activity: Set API key"
+      },
+      {
+        "command": "andcool-activity-ext.open_url",
+        "title": "Andcool Activity: Open activity URL"
       }
     ],
     "configuration": [
@@ -47,6 +52,11 @@
             "type": "string",
             "default": "",
             "description": "Api Key"
+          },
+          "andcool-activity-ext.url": {
+            "type": "string",
+            "default": "",
+            "description": "Activity URL"
           }
         }
       }

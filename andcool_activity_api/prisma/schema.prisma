@@ -1,0 +1,28 @@
+datasource db {
+    provider = "sqlite"
+    url      = "file:dataBase.db"
+}
+
+generator db {
+    provider = "prisma-client-js"
+}
+
+model User {
+    id         Int        @id @default(autoincrement())
+    code       String
+    token      String
+    activities Activity[]
+}
+
+model Activity {
+    id             Int      @id
+    workplace      String?
+    file           String?
+    editor         String?
+    debugging      Boolean  @default(false)
+    start_time     DateTime @default(now())
+    last_heartbeat DateTime @default(now())
+
+    User   User? @relation(fields: [Userid], references: [id])
+    Userid Int?
+}
