@@ -67,15 +67,14 @@ export class ActivityService {
         }
 
         const TTL = Number(process.env.TTL);
-        const now_date = Date.now();
 
-        const parsed: Activity[] = user.activities.filter(async (activity: Activity) => {
+        const parsed: Activity[] = user.activities.filter((activity: Activity) => {
+            const now_date = new Date().getTime();
             const last_heartbeat = new Date(activity.last_heartbeat).getTime();
             if (now_date - last_heartbeat > TTL) {
-                await this.prismaService.activity.delete({ where: { id: activity.id } });
-                return false;
+                this.prismaService.activity.delete({ where: { id: activity.id } }).then();
             }
-            return true;
+            return now_date - last_heartbeat <= TTL;
         });
 
         return {

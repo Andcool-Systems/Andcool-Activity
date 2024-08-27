@@ -11,7 +11,6 @@ async function bootstrap() {
 		},
 		credentials: true,
 	});
-	app.use(morgan(':method :url :status - :response-time ms'));
 	await app.listen(8004);
 }
 bootstrap();
