@@ -19,6 +19,7 @@ model Activity {
     workplace      String?
     file           String?
     editor         String?
+    editor_code    String?
     debugging      Boolean  @default(false)
     start_time     DateTime @default(now())
     last_heartbeat DateTime @default(now())

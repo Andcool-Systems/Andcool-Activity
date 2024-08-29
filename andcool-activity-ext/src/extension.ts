@@ -27,7 +27,8 @@ const startHeartbeat = () => {
 				workplace: workplace,
 				file: file_path,
 				debugging: isDebugging,
-				editor: 'Visual Studio Code'
+				editor: 'Visual Studio Code',
+				editor_code: 'vscode',
 			},
 			{
 				headers: { Authorization: `Api-Key ${API_KEY}` },

@@ -21,6 +21,10 @@ export class HeartbeatDto {
     editor?: string;
 
     @IsNotEmpty()
+    @IsString()
+    editor_code?: string;
+
+    @IsNotEmpty()
     @IsBoolean()
     debugging?: boolean;
 }

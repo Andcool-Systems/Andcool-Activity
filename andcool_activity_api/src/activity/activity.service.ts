@@ -4,18 +4,8 @@ import { EndActivityDto } from './dto/endActivity.dto';
 import { Session } from 'src/guards/auth.guard';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { v4 as uuidv4 } from 'uuid';
+import { Activity } from '@prisma/client';
 
-
-interface Activity {
-    id: number;
-    workplace: string;
-    file: string;
-    editor: string;
-    debugging: boolean;
-    start_time: Date;
-    last_heartbeat: Date;
-    Userid: number | null;
-}
 
 @Injectable()
 export class ActivityService {
@@ -32,6 +22,7 @@ export class ActivityService {
                     file: body.file,
                     debugging: body.debugging,
                     editor: body.editor,
+                    editor_code: body.editor_code,
                     User: { connect: { id: session.id } }
                 }
             });
@@ -49,6 +40,7 @@ export class ActivityService {
                 file: body.file,
                 debugging: body.debugging,
                 editor: body.editor,
+                editor_code: body.editor_code,
                 last_heartbeat: new Date()
             }
         });
@@ -84,6 +76,7 @@ export class ActivityService {
                 workplace: activity.workplace,
                 file: activity.file,
                 editor: activity.editor,
+                editor_code: activity.editor_code,
                 debugging: activity.debugging,
                 start_time: activity.start_time,
             }))
