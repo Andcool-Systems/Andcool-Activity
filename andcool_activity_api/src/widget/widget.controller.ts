@@ -30,9 +30,11 @@ export class WidgetController {
         let filename: string = '';
         let workplace: string = '';
         let time: string = '';
+        let no_coding_1: string = '';
+        let no_coding_2: string = '';
         if (activity.statusCode !== 200 || activity.activities.length === 0) {
-            editor = 'There is no coding';
-            filename = 'activity yet ❤';
+            no_coding_1 = 'There is no coding';
+            no_coding_2 = 'activity yet ❤';
             
         } else {
             const _activity = activity.activities[0];
@@ -46,7 +48,9 @@ export class WidgetController {
             editor: editor.length <= 24 ? editor : editor.slice(0, 24) + '...',
             filename: filename.length <= 28 ? filename : filename.slice(0, 25) + '...',
             workplace: workplace.length <= 34 ? workplace : workplace.slice(0, 31) + '...',
-            time: time
+            time: time,
+            no_coding_1: no_coding_1,
+            no_coding_2: no_coding_2
         };
     }
 }
