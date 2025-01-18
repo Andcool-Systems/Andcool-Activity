@@ -2,12 +2,12 @@
   "name": "andcool-activity-ext",
   "displayName": "Andcool Activity",
   "description": "Activity client for andcool site",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "author": {
     "name": "AndcoolSystems",
     "url": "https://andcool.ru"
   },
-  "publisher": "andcoolsystems",
+  "publisher": "AndcoolSystems",
   "engines": {
     "vscode": "^1.92.0"
   },

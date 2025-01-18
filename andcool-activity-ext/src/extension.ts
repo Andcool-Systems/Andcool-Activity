@@ -16,9 +16,9 @@ let interval: NodeJS.Timeout | null = null;
 const startHeartbeat = () => {
 	interval = setInterval(async () => {
 		const editor = vscode.window.activeTextEditor;
-		const workplace = vscode.workspace.workspaceFolders?.[0].uri.fsPath.split('\\').reverse()[0] ?? null;
+		const workplace = vscode.workspace.workspaceFolders?.[0].uri.fsPath.replaceAll('/', '\\').split('\\').reverse()[0] ?? null;
 		const isDebugging = vscode.debug.activeDebugSession !== undefined;
-		const file_path = editor ? editor.document.fileName.split('\\').reverse()[0] : null;
+		const file_path = editor ? editor.document.fileName.replaceAll('/', '\\').split('\\').reverse()[0] : null;
 		if (!API_KEY) return;
 
 		const response = await axios.post(API_URL + '/heartbeat',
